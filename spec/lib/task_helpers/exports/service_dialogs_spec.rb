@@ -1,4 +1,4 @@
-require "rake"
+#require "rake"
 
 describe TaskHelpers::Exports::ServiceDialogs do
   let(:buttons) { "the buttons" }
