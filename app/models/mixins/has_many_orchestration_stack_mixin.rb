@@ -4,7 +4,7 @@ module HasManyOrchestrationStackMixin
   included do
     has_many :orchestration_stacks,
              :foreign_key => :ems_id,
-             :dependent   => :destroy
+             :dependent   => :nullify
 
     has_many :orchestration_stacks_outputs, :through => :orchestration_stacks, :source => :outputs
     has_many :orchestration_stacks_parameters, :through => :orchestration_stacks, :source => :parameters
