@@ -184,8 +184,6 @@ class VmOrTemplate < ApplicationRecord
   delegate :connect_lans, :disconnect_lans, :to => :hardware, :allow_nil => true
   delegate :queue_name_for_ems_operations, :to => :ext_management_system, :allow_nil => true
 
-  after_save :save_genealogy_information
-
   scope :active,       ->       { where.not(:ems_id => nil) }
   scope :with_type,    ->(type) { where(:type => type) }
   scope :archived,     ->       { where(:ems_id => nil, :storage_id => nil) }
@@ -529,12 +527,6 @@ class VmOrTemplate < ApplicationRecord
 
   def genealogy_parent=(parent)
     @genealogy_parent_object = parent
-  end
-
-  def save_genealogy_information
-    if defined?(@genealogy_parent_object) && @genealogy_parent_object
-      with_relationship_type('genealogy') { self.parent = @genealogy_parent_object }
-    end
   end
 
   def os_image_name
