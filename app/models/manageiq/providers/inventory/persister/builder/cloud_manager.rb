@@ -104,8 +104,7 @@ module ManageIQ::Providers
             vms_inventory_collection.model_class
                                     .select([:id])
                                     .where(:id => vms_genealogy_parents.keys).find_each do |vm|
-              parent = parent_miq_templates[vms_genealogy_parents[vm.id]]
-              vm.with_relationship_type('genealogy') { vm.parent = parent }
+              vm.parent = parent_miq_templates[vms_genealogy_parents[vm.id]]
             end
           end
 
@@ -117,8 +116,7 @@ module ManageIQ::Providers
             miq_templates_inventory_collection.model_class
                                               .select([:id])
                                               .where(:id => miq_template_genealogy_parents.keys).find_each do |miq_template|
-              parent = parent_vms[miq_template_genealogy_parents[miq_template.id]]
-              miq_template.with_relationship_type('genealogy') { miq_template.parent = parent }
+              miq_template.parent = parent_vms[miq_template_genealogy_parents[miq_template.id]]
             end
           end
         end

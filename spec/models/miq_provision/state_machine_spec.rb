@@ -146,9 +146,9 @@ RSpec.describe MiqProvision do
 
         task.signal(:post_create_destination)
 
-        task.destination.with_relationship_type("genealogy") { |v| expect(v.parent).to   eq(template) }
-        vm.reload.with_relationship_type("genealogy")        { |v| expect(v.parent).to   eq(template) }
-        template.reload.with_relationship_type("genealogy")  { |v| expect(v.children).to eq([vm]) }
+        expect(task.destination.parent).to eq(template)
+        expect(vm.reload.parent).to eq(template)
+        expect(template.reload.children).to eq([vm])
       end
     end
   end

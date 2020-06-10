@@ -184,8 +184,6 @@ class VmOrTemplate < ApplicationRecord
   delegate :connect_lans, :disconnect_lans, :to => :hardware, :allow_nil => true
   delegate :queue_name_for_ems_operations, :to => :ext_management_system, :allow_nil => true
 
-  after_save :save_genealogy_information
-
   scope :active,       ->       { where.not(:ems_id => nil) }
   scope :with_type,    ->(type) { where(:type => type) }
   scope :archived,     ->       { where(:ems_id => nil, :storage_id => nil) }
@@ -283,7 +281,7 @@ class VmOrTemplate < ApplicationRecord
   end
 
   include RelationshipMixin
-  self.default_relationship_type = "genealogy"
+  #self.default_relationship_type = "genealogy"
 
   include MiqPolicyMixin
   include AlertMixin
@@ -523,19 +521,19 @@ class VmOrTemplate < ApplicationRecord
     !(last_scan_on.nil? || last_scan_on > last_sync_on)
   end
 
-  def genealogy_parent
-    with_relationship_type("genealogy") { parent }
-  end
+   def genealogy_parent
+     parent
+   end
 
-  def genealogy_parent=(parent)
-    @genealogy_parent_object = parent
-  end
+  # def genealogy_parent=(parent)
+  #   @genealogy_parent_object = parent
+  # end
 
-  def save_genealogy_information
-    if defined?(@genealogy_parent_object) && @genealogy_parent_object
-      with_relationship_type('genealogy') { self.parent = @genealogy_parent_object }
-    end
-  end
+  # def save_genealogy_information
+  #   if defined?(@genealogy_parent_object) && @genealogy_parent_object
+  #     with_relationship_type('genealogy') { self.parent = @genealogy_parent_object }
+  #   end
+  # end
 
   def os_image_name
     name = OperatingSystem.image_name(self)
@@ -783,16 +781,16 @@ class VmOrTemplate < ApplicationRecord
   # Parent rp, folder and dc methods
   # TODO: Replace all with ancestors lookup once multiple parents is sorted out
   def parent_resource_pool
-    with_relationship_type('ems_metadata') do
-      parent(:of_type => "ResourcePool")
-    end
+    #with_relationship_type('ems_metadata') do
+      #parent.where(:type => "ResourcePool")
+    #end
   end
   alias_method :owning_resource_pool, :parent_resource_pool
 
   def parent_blue_folder
-    with_relationship_type('ems_metadata') do
-      parent(:of_type => "EmsFolder")
-    end
+    #with_relationship_type('ems_metadata') do
+      #parent.where(:type => "EmsFolder")
+    #end
   end
   alias_method :owning_blue_folder, :parent_blue_folder
 
@@ -1730,7 +1728,7 @@ class VmOrTemplate < ApplicationRecord
       :timestamp         => event_timestamp,
       :vm_or_template_id => id,
       :vm_name           => name,
-      :vm_location       => path,
+      :vm_location       => path.first.location,
     }
     event[:ems_id] = ems_id unless ems_id.nil?
 

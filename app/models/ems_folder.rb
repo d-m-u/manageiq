@@ -43,6 +43,9 @@ class EmsFolder < ApplicationRecord
     folders.select { |f| !f.kind_of?(Datacenter) }
   end
 
+  def child_ancestry
+  end
+
   def datacenters_only
     folders.select { |f| f.kind_of?(Datacenter) }
   end

@@ -16,6 +16,9 @@ class MiqTemplate < VmOrTemplate
     MiqTemplate
   end
 
+  def child_ancestry
+  end
+
   def self.corresponding_model
     parent::Vm
   end

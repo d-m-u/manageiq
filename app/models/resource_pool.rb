@@ -50,6 +50,9 @@ class ResourcePool < ApplicationRecord
     remove_all_children(:of_type => 'ResourcePool')
   end
 
+  def child_ancestry
+  end
+
   def root_resource_pool
     rel = path_rels(:of_type => 'ResourcePool').first
     rel.resource_id == id ? self : Relationship.resource(rel)

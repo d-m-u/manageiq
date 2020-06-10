@@ -39,7 +39,7 @@ module SpecMockedData
       :vm_cloud,
       vm_data(1).merge(
         :flavor                => @flavor_1,
-        :genealogy_parent      => @image1,
+        :parent                => @image1,
         :key_pairs             => [@key_pair1],
         :location              => 'host_10_10_10_1.com',
         :ext_management_system => @ems,
@@ -49,7 +49,7 @@ module SpecMockedData
       :vm_cloud,
       vm_data(12).merge(
         :flavor                => @flavor1,
-        :genealogy_parent      => @image1,
+        :parent                => @image1,
         :key_pairs             => [@key_pair1, @key_pair12],
         :location              => 'host_10_10_10_1.com',
         :ext_management_system => @ems,
@@ -59,7 +59,7 @@ module SpecMockedData
       :vm_cloud,
       vm_data(2).merge(
         :flavor                => @flavor2,
-        :genealogy_parent      => @image2,
+        :parent                => @image2,
         :key_pairs             => [@key_pair2],
         :location              => 'host_10_10_10_2.com',
         :ext_management_system => @ems,

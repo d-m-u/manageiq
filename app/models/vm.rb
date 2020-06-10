@@ -1,4 +1,8 @@
+require 'ancestry'
+require 'ancestry_patch'
+
 class Vm < VmOrTemplate
+  has_ancestry
   default_scope { where(:template => false) }
   virtual_has_one :supported_consoles, :class_name => "Hash"
 

@@ -465,20 +465,20 @@ module RelationshipMixin
   # Returns a String form of the ancestor class/id pairs of the record
   #   Accepts the usual options, plus the options for Relationship.stringify_*,
   #   as well as :include_self which defaults to false.
-  def ancestry(*args)
-    stringify_options = args.extract_options!
-    options = stringify_options.slice!(:field_delimiter, :record_delimiter, :exclude_class, :field_method, :include_self)
+  # def ancestry(*args)
+  #   stringify_options = args.extract_options!
+  #   options = stringify_options.slice!(:field_delimiter, :record_delimiter, :exclude_class, :field_method, :include_self)
 
-    include_self = stringify_options.delete(:include_self)
-    field_method = stringify_options[:field_method] || :id
+  #   include_self = stringify_options.delete(:include_self)
+  #   field_method = stringify_options[:field_method] || :id
 
-    meth = include_self ? :path : :ancestors
-    meth = :"#{meth.to_s.singularize}_ids" if field_method == :id
-    rels = send(meth, options)
+  #   meth = include_self ? :path : :ancestors
+  #   meth = :"#{meth.to_s.singularize}_ids" if field_method == :id
+  #   rels = send(meth, options)
 
-    rels_meth = :"stringify_#{field_method == :id ? "resource_pairs" : "rels"}"
-    Relationship.send(rels_meth, rels, stringify_options)
-  end
+  #   rels_meth = :"stringify_#{field_method == :id ? "resource_pairs" : "rels"}"
+  #   Relationship.send(rels_meth, rels, stringify_options)
+  # end
 
   # Returns a list of all relationships in the tree from the root
   def fulltree_rels(*args)
