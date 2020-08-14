@@ -2,7 +2,8 @@ module OwnershipMixin
   extend ActiveSupport::Concern
 
   included do
-    before_validation :set_tenant_from_group
+    before_validation :set_tenant_from_group,
+      if: Proc.new { |c| c.miq_group && c.miq_group.tenant_id != tenant_id }
 
     belongs_to :evm_owner, :class_name => "User"
     belongs_to :miq_group
@@ -110,6 +111,6 @@ module OwnershipMixin
   end
 
   def set_tenant_from_group
-    self.tenant_id = miq_group.tenant_id if miq_group
+    self.tenant_id = miq_group.tenant_id
   end
 end
