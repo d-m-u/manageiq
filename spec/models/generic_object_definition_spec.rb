@@ -150,6 +150,11 @@ RSpec.describe GenericObjectDefinition do
     end
   end
 
+  it "doesn't access database when unchanged model is saved" do
+    m = FactoryBot.create(:generic_object_definition)
+    expect { m.valid? }.to make_database_queries(:count => 1)
+  end
+
   describe '#add_property_method' do
     let(:definition) do
       FactoryBot.create(:generic_object_definition,
