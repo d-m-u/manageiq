@@ -28,8 +28,11 @@ class ManageIQ::Providers::AnsibleRunnerWorkflow < Job
 
   def pre_execute
     verify_options
-    prepare_repository
-    route_signal(:execute)
+    if prepare_repository == "failed to connect"
+      route_signal(:check_connection)
+    else
+      route_signal(:execute)
+    end
   end
 
   def launch_runner
@@ -94,16 +97,18 @@ class ManageIQ::Providers::AnsibleRunnerWorkflow < Job
     self.state ||= 'initialize'
 
     {
-      :initializing => {'initialize'       => 'waiting_to_start'},
-      :start        => {'waiting_to_start' => 'pre_execute'},
-      :pre_execute  => {'pre_execute'      => 'execute'},
-      :execute      => {'execute'          => 'running'},
-      :poll_runner  => {'running'          => 'running'},
-      :post_execute => {'running'          => 'post_execute'},
-      :finish       => {'*'                => 'finished'},
-      :abort_job    => {'*'                => 'aborting'},
-      :cancel       => {'*'                => 'canceling'},
-      :error        => {'*'                => '*'}
+      :initializing     => {'initialize'       => 'waiting_to_start'},
+      :start            => {'waiting_to_start' => 'pre_execute'},
+      :pre_execute      => {'pre_execute'      => 'check_connection'},
+      :check_connection => {'check_connection' => 'aborting'},
+      :retry_connection => {'retry_connection' => 'retrying'},
+      :execute          => {'execute'          => 'running'},
+      :poll_runner      => {'running'          => 'running'},
+      :post_execute     => {'running'          => 'post_execute'},
+      :finish           => {'*'                => 'finished'},
+      :abort_job        => {'*'                => 'aborting'},
+      :cancel           => {'*'                => 'canceling'},
+      :error            => {'*'                => '*'}
     }
   end
 
@@ -160,6 +165,10 @@ class ManageIQ::Providers::AnsibleRunnerWorkflow < Job
     Ansible::Runner::ResponseAsync.load(context[:ansible_runner_response])
   end
 
+  def check_connection
+    queue_signal(:abort)
+  end
+
   def verify_options
     raise NotImplementedError, "must be implemented in a subclass"
   end
@@ -167,8 +176,11 @@ class ManageIQ::Providers::AnsibleRunnerWorkflow < Job
   def prepare_repository
     return unless options[:configuration_script_source_id]
 
-    checkout_git_repository
-    adjust_options_for_git_checkout_tempdir!
+    if checkout_git_repository == "failed to connect"
+      return "failed to connect"
+    else
+      adjust_options_for_git_checkout_tempdir!
+    end
   end
 
   def adjust_options_for_git_checkout_tempdir!
@@ -182,8 +194,7 @@ class ManageIQ::Providers::AnsibleRunnerWorkflow < Job
     _log.info("Checking out git repository to #{options[:git_checkout_tempdir].inspect}...")
     css.checkout_git_repository(options[:git_checkout_tempdir])
   rescue MiqException::MiqUnreachableError => err
-    miq_task.job.timeout!
-    raise "Failed to connect with [#{err.class}: #{err}], job aborted"
+    return "failed to connect"
   end
 
   def cleanup_git_repository
