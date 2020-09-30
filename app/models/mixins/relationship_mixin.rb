@@ -138,7 +138,7 @@ module RelationshipMixin
 
   # Returns all of the class/id pairs of the parents of the record, [] for a root node
   def parent_ids(*args)
-    Relationship.resource_pairs(parent_rels(*args))
+    Relationship.resources(parent_rels(*args)).pluck(:id)
   end
 
   # Returns the number of parents of the record
@@ -182,7 +182,7 @@ module RelationshipMixin
 
   # Returns the id of the root of the tree the record is in
   def root_id(*args)
-    Relationship.resource_pair(root_rel(*args))
+    Relationship.resources(root_rel(*args)).pluck(:id)
   end
 
   # Returns true if the record is a root node, false otherwise
@@ -216,7 +216,7 @@ module RelationshipMixin
   # Returns a list of ancestor class/id pairs, starting with the root class/id
   #   and ending with the parent class/id
   def ancestor_ids(*args)
-    Relationship.resource_pairs(ancestor_rels(*args))
+    Relationship.resources(ancestor_rels(*args)).pluck(:id)
   end
 
   # Returns the number of ancestor records
@@ -242,7 +242,7 @@ module RelationshipMixin
   # Returns a list of the path class/id pairs, starting with the root class/id
   #   and ending with the node's own class/id
   def path_ids(*args)
-    Relationship.resource_pairs(path_rels(*args))
+    Relationship.resources(path_rels(*args)).pluck(:id)
   end
 
   # Returns the number of records in the path
@@ -264,7 +264,7 @@ module RelationshipMixin
 
   # Returns a list of child class/id pairs
   def child_ids(*args)
-    Relationship.resource_pairs(child_rels(*args))
+    Relationship.resources(child_rels(*args)).pluck(:id)
   end
 
   # Returns the number of child records
@@ -296,7 +296,7 @@ module RelationshipMixin
 
   # Returns a list of sibling class/id pairs
   def sibling_ids(*args)
-    Relationship.resource_pairs(sibling_rels(*args))
+    Relationship.resources(sibling_rels(*args)).pluck(:id)
   end
 
   # Returns the number of sibling records
@@ -328,7 +328,7 @@ module RelationshipMixin
 
   # Returns a list of descendant class/id pairs
   def descendant_ids(*args)
-    Relationship.resource_pairs(descendant_rels(*args))
+    Relationship.resources(descendant_rels(*args)).pluck(:id)
   end
 
   # Returns the number of descendant records
@@ -371,7 +371,7 @@ module RelationshipMixin
 
   # Returns a list of all class/id pairs in the record's subtree
   def subtree_ids(*args)
-    Relationship.resource_pairs(subtree_rels(*args))
+    Relationship.resources(subtree_rels(*args)).pluck(:id)
   end
 
   # Returns the number of records in the record's subtree
@@ -536,7 +536,7 @@ module RelationshipMixin
 
     # Determine which child relationships already exist
     unless options[:skip_check] || (child_ids = self.child_ids).empty?
-      child_objs = child_objs.reject { |c| child_ids.include?([c.class.base_class.name, c.id]) }
+      child_objs = child_objs.reject { |c| child_ids.include?(c.id) }
     end
 
     return child_objs if child_objs.empty?
@@ -664,11 +664,11 @@ module RelationshipMixin
   end
 
   def is_descendant_of?(obj)
-    ancestor_ids.include?([obj.class.base_class.name, obj.id])
+    ancestor_ids.include?(obj.id)
   end
 
   def is_ancestor_of?(obj)
-    descendant_ids.include?([obj.class.base_class.name, obj.id])
+    descendant_ids.include?(obj.id)
   end
 
   def detect_ancestor(*args, &block)
